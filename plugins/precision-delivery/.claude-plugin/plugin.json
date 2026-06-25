@@ -1,0 +1,16 @@
+{
+  "name": "precision-delivery",
+  "displayName": "Precision Delivery",
+  "version": "1.0.0",
+  "description": "Ship software with extreme precision. Enforces PR-size limits, TDD, Definition of Done CI gates, DORA metrics, feature-flag vs canary rollout patterns, and Google SRE toil elimination.",
+  "author": {
+    "name": "grishatg",
+    "email": "greg.tugulea@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": ["code-review", "quality-gates", "dora", "tdd", "feature-flags", "canary", "productivity"],
+  "skills": "./skills/",
+  "commands": "./commands/",
+  "agents": "./agents/",
+  "hooks": "./hooks/hooks.json"
+}

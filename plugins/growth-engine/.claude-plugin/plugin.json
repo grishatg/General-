@@ -1,0 +1,46 @@
+{
+  "name": "growth-engine",
+  "displayName": "Growth Engine",
+  "version": "1.0.0",
+  "description": "Sell, market, and monetize. B2B sales automation with ICP signal stacking, AIDA/PAS content marketing, monetization unit economics (LTV:CAC, NRR), and MCP connectors for HubSpot, Notion, Slack, and more.",
+  "author": {
+    "name": "grishatg",
+    "email": "greg.tugulea@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": ["sales", "marketing", "monetization", "gtm", "crm", "icp", "nrr", "mcp"],
+  "skills": "./skills/",
+  "commands": "./commands/",
+  "agents": "./agents/",
+  "mcpServers": "./.mcp.json",
+  "userConfig": {
+    "hubspot_api_token": {
+      "type": "string",
+      "title": "HubSpot API Token",
+      "description": "HubSpot private app token (Settings > Integrations > Private Apps)",
+      "sensitive": true,
+      "required": false
+    },
+    "lusha_api_key": {
+      "type": "string",
+      "title": "Lusha API Key",
+      "description": "Lusha API key from your account settings",
+      "sensitive": true,
+      "required": false
+    },
+    "slack_bot_token": {
+      "type": "string",
+      "title": "Slack Bot Token",
+      "description": "Slack bot token (xoxb-...) from api.slack.com/apps",
+      "sensitive": true,
+      "required": false
+    },
+    "notion_token": {
+      "type": "string",
+      "title": "Notion Integration Token",
+      "description": "Notion internal integration token from notion.so/my-integrations",
+      "sensitive": true,
+      "required": false
+    }
+  }
+}
