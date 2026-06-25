@@ -1,0 +1,32 @@
+{
+  "name": "general-marketplace",
+  "owner": {
+    "name": "grishatg",
+    "email": "greg.tugulea@gmail.com"
+  },
+  "description": "Two Claude Code plugins: precision-delivery (ship with accuracy and DORA-grade quality gates) and growth-engine (sales automation, marketing, and monetization with MCP connectors).",
+  "version": "1.0.0",
+  "metadata": {
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "precision-delivery",
+      "source": "./plugins/precision-delivery",
+      "displayName": "Precision Delivery",
+      "description": "Skills, commands, and agents for shipping software with extreme precision — PR-size enforcement, TDD, Definition of Done gates, feature-flag vs canary patterns, DORA metrics, developer toil elimination.",
+      "keywords": ["code-review", "quality", "delivery", "productivity", "engineering", "dora", "tdd"],
+      "license": "MIT",
+      "defaultEnabled": false
+    },
+    {
+      "name": "growth-engine",
+      "source": "./plugins/growth-engine",
+      "displayName": "Growth Engine",
+      "description": "Skills, commands, agents, and MCP connectors for B2B sales automation (ICP, signal stacking, cadences), content marketing (AIDA/PAS, SEO clusters), and monetization (LTV:CAC, NRR, trial-to-paid).",
+      "keywords": ["sales", "marketing", "monetization", "gtm", "crm", "mcp", "hubspot", "lusha"],
+      "license": "MIT",
+      "defaultEnabled": false
+    }
+  ]
+}
