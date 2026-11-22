@@ -2,9 +2,23 @@
 
 ![v7](v7_a1_sheet.png)
 
-**`AB_Rollie_Book_v7_A1_by_object.3mf`**: a Bambu Studio project for the **Bambu Lab A1 + AMS lite**. It fits on **one plate**, prints **by object**, and needs no supports, glue or pauses.
+| File | Use |
+|---|---|
+| **`AB_Rollie_Book_v7_A1_by_object.3mf`** | **Open this one.** A full Bambu Studio project for the **A1 + AMS lite**: one plate, by object, every setting included. |
+| `AB_Rollie_Book_v7_A1_geometry_only.3mf` | **Fallback.** Identical parts, colours, modifiers and plate, but no print profile: it uses your own A1 presets, so it cannot raise a config error. |
 
 ![plate](v7_a1_plate.png)
+
+## Fix in this revision: "Invalid configuration file"
+- **Problem:** the previous A1 file failed to open ("Invalid configuration file", then "no geometry data").
+- **Cause:** its settings were built from Bambu's **development** profiles.
+  - That added 193 options beyond the creator's file. Released versions flag 43 to 123 of them as unknown.
+  - It also added the new dual-nozzle (H2D) "extruder variant" keys.
+  - As a result, the filament colours never loaded, and Bambu Studio rejects a project with no filaments.
+- **Fix:** the project now uses **only the exact settings layout of the creator's original file**, which your Bambu Studio already opens (366 options, same order).
+  - The values are Bambu's **released** A1 presets: Bambu Lab A1 0.4 nozzle, 0.16mm High Quality @BBL A1, and Bambu PETG HF @BBL A1 ×3.
+  - **Removed:** no multi-extruder keys and no unknown options.
+- **Geometry is unchanged:** the STLs are byte-identical.
 
 ## The only extra parts you need
 | Part | Qty | Notes |
@@ -13,40 +27,44 @@
 | **1.75 mm filament** (PETG-HF) | ≈ 87 mm | Hinge pin |
 | PETG-HF **grey / black / yellow** | AMS lite slots 1 / 2 / 3 | Cover / tray / yellow details and spine sleeve |
 
-## Changes in this revision
-- **Yellow on the outside faces is 4 layers (0.68 mm)** instead of 1.0 mm. It prints against the plate and stops well short of the grey or black body. The A·B is the same 0.68 mm deep.
-- **Bambu Lab A1 profile:** built from Bambu's own system presets (Bambu Lab A1 0.4 nozzle, 0.16mm High Quality @BBL A1, Bambu PETG HF @BBL A1 ×3), resolved from the public BambuStudio repo, so the file carries the **A1's own start G-code**.
-- **One plate, by object:** the cover, tray and sleeve each print completely, one after another, so the grey and black never alternate layer by layer.
-  - **Spacing:** the parts sit **74 mm** apart, above the A1's 73 mm by-object clearance.
-  - **Height:** every part is under the 25 mm rod height.
-  - **Purge:** prime tower off; the A1 purges into its chute.
-- **Snap-in magnets (no pauses):** Bambu Studio does **not** apply layer pauses in by-object mode. Its source assigns per-layer custom G-code only in by-layer printing. So the magnets now snap in after printing.
-  - **Lip:** each pocket has a printed 0.4 mm lip, 0.12 mm smaller than the magnet, with 4 relief slots. Press the magnet in with your thumb until it clicks.
-  - **Strength:** walls of at least 0.8 mm; 1.0 mm between the magnets when closed.
-
 ## How to print
-1. Open the 3MF. Load **grey, black and yellow PETG-HF** into AMS lite slots 1, 2 and 3, then press **Sync AMS**.
-2. Check that the plate shows **Print sequence: By object**. Slice and print. No pauses, no supports.
-3. **Magnets:** stick the two magnets together and mark the two faces that touch. Press each magnet into its pocket **marked face OUT** (visible), so that they attract when the case closes.
+1. Open `AB_Rollie_Book_v7_A1_by_object.3mf`.
+   - If Bambu Studio asks about **customised presets**, keep the project's settings; this file deliberately differs from the stock presets.
+   - Load **grey, black and yellow PETG-HF** into AMS lite slots 1, 2 and 3, then press **Sync AMS**.
+2. Check that the plate shows **Print sequence: By object** and the **Textured PEI** plate. Slice and print. No pauses, no supports.
+3. **Magnets:** stick the two magnets together and mark the two faces that touch. Press each magnet into its pocket **marked face OUT** until it clicks, so the magnets attract when the case closes.
 4. **Hinge:** slide the yellow sleeve between the cover knuckles, then push the filament pin through from the top and trim it flush. Optionally, heat the ends briefly to flare them so the pin stays put.
 
-## Print profile
-- **Base:** Bambu's **0.16mm High Quality @BBL A1** (outer wall 60 mm/s at 2000 mm/s², default acceleration 4000).
+**If the main file still refuses to open,** use `..._geometry_only.3mf`.
+- **What comes with it:** Bambu keeps each part's filament, the 100% modifiers, and the per-object walls and infill. This is confirmed in its source; it adds the filament slots itself.
+- **What you set:**
+  - **Presets:** printer **Bambu Lab A1 0.4 nozzle**, process **0.16mm High Quality @BBL A1**, filaments **Bambu PETG HF** ×3.
+  - **Plate:** Textured PEI.
+  - **Plate settings:** print sequence **By object**.
+  - **Prime tower:** off.
+  - **Shells:** top 6 / bottom 5.
+  - **Seam:** back.
+  - **Elephant foot:** 0.15.
+
+## Print profile (in the main file)
+- **Base:** Bambu's **0.16mm High Quality @BBL A1** (outer wall 60 mm/s at 2000 mm/s², default acceleration 4000, nozzle 240 °C, Textured PEI 70 °C).
 - **Walls and shells:** 4 walls (arachne), 6 top / 5 bottom shells.
 - **Infill:** 50% gyroid, with **100% infill and 6 walls** on the hinge, end blocks and magnet clasp.
-- **Seam and first layer:** seam at the back (the top end of the case); elephant-foot compensation 0.15; Textured PEI plate.
-- **Purge:** flush into infill on the cover and tray.
+- **Seam and first layer:** seam at the back (the top end of the case); elephant-foot compensation 0.15.
+- **By object on the A1:** parts sit 74 mm apart (clearance 73 mm), and all are under the 25 mm rod height.
+- **Purge:** prime tower off; flush into infill on the cover and tray.
 
-## Test slice (PrusaSlicer 2.7.2, A1 clearances and limits, sequential printing)
-| | |
-|---|---|
-| Estimated time | **3 h 44 m**, including AMS lite load and unload (≈ 41 min of that) |
-| Plus A1 purge time (not modelled) | ≈ 15–30 s per swap, so **≈ 4 to 4¼ h in total** |
-| Colour swaps | 47. Most of them come from the A·B on the bottom, which stands upright in print |
-| Filament in the parts | ≈ 19.5 g grey, 36.6 g black, 0.6 g yellow (purge goes to the chute and adds ≈ 15–20 g) |
-| Result | Slices cleanly with sequential clearance satisfied. "Long bridging" warning: benign internal bridges |
+## Test slice and re-slice (PrusaSlicer 2.7.2 with A1 clearances, speeds and limits, sequential)
+| | Slice from CAD | **Re-slice of the shipped 3MF** (meshes, filaments and modifiers read back out of the file) |
+|---|---|---|
+| Time (incl. AMS lite load/unload) | 3 h 44 m 11 s | **3 h 44 m 08 s** |
+| Colour swaps / layers | 47 / 121 | 47 / 121 |
+| Filament in parts (grey / black / yellow) | 19.5 / 36.6 / 0.6 g | 19.5 / 36.6 / 0.6 g |
 
-Reproduce it with `prusa-slicer --export-gcode --load test-slice/a1_hq_petghf_0.16.ini test-slice/a1_one_plate.3mf`.
+- **Real-world time:** add the A1 purge (≈ 15–30 s per swap), giving **≈ 4 to 4¼ h**. Purge adds ≈ 15–20 g to the chute.
+- **Swaps:** most of them come from the A·B on the bottom face, which stands upright in print.
+- **"Long bridging" note:** this is benign. It is the 0.6 mm groove ceilings at z 0.68, plus the first solid layer over the gyroid inside the 3.0 / 2.6 mm floors. No supports are needed.
+- **Reproduce:** `prusa-slicer --export-gcode --load test-slice/a1_hq_petghf_0.16.ini test-slice/roundtrip_from_shipped_3mf.3mf`
 
 ## Verification
 | Check | Status |
@@ -54,8 +72,14 @@ Reproduce it with `prusa-slicer --export-gcode --load test-slice/a1_hq_petghf_0.
 | Envelope 65 × 15 × 88, single solid parts, no overlaps | PASS |
 | 6 rollies clear; cover swings to 165° without contact | PASS |
 | Magnet pockets: walls ≥ 0.8 mm, slotted snap lips present | PASS |
-| 3MF: 9 watertight meshes on the bed, 1 plate, A1 printer/process/filament presets, by object, no prime tower | PASS (structure) |
-| By-object clearances: gaps ≥ 73 mm, heights < 25 mm | PASS (layout and PrusaSlicer sequential slice) |
-| Opened in Bambu Studio / test print | NOT_EVALUATED |
+| Settings vs Bambu's option rules at releases **2.03, 2.08 and 2.09** | PASS: no flag that the creator's (working) file doesn't also raise. The previous file raised 60 to 123 more, plus the dual-nozzle keys |
+| 3MF integrity: 9 manifold meshes, part filaments 1/2/3, 2 modifiers, 1 plate by object | PASS (read back from the shipped file) |
+| Re-slice of the shipped file | PASS (see above) |
+| Opened in real Bambu Studio | NOT_EVALUATED here: Bambu Studio can't be downloaded in this build environment. The loader was checked against Bambu's source instead |
 
-`superseded/` holds the earlier P1S three-plate file, which sealed the magnets in with pauses.
+`src/` holds the generators:
+- `a1_safe.py`: settings builder
+- `bbsvalidate.py`: loader check
+- `roundtrip_reslice.py`: re-slice of the shipped file
+
+`superseded/` holds the earlier P1S three-plate file.

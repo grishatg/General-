@@ -1,7 +1,7 @@
 """Bambu Studio 3MF for v7 on a Bambu Lab A1 (+ AMS lite): ONE plate, print BY OBJECT, snap-in magnets (no pauses)."""
 import sys, os, json, uuid, zipfile
 sys.path.insert(0, os.path.dirname(__file__))
-import v7, v6_final, a1_profile, manifold3d as m3
+import v7, v6_final, a1_safe, manifold3d as m3
 from v3 import chbox
 
 GAP_BY_OBJECT = 74.0     # A1: extruder_clearance_max_radius = 73 mm (Bambu doubles half-radius offsets -> 73 mm hull-to-hull)
@@ -14,7 +14,7 @@ def layout():
     cy = 16 + 44
     return {'cover': (cx_cover, cy), 'tray': (cx_tray, cy), 'sleeve': ((cx_cover + cx_tray) / 2, 200.0)}
 
-def export(r, out, orig):
+def export(r, out, orig, geometry_only=False):
     os.makedirs(out, exist_ok=True)
     P = v7.P; W, D, H = v7.W, v7.D, v7.H
     U = lambda vs: m3.Manifold.batch_boolean(vs, m3.OpType.Add) if len(vs) > 1 else vs[0]
@@ -81,23 +81,14 @@ def export(r, out, orig):
                  'sparse_infill_density': '50%', 'sparse_infill_pattern': 'gyroid', 'wall_generator': 'arachne', 'seam_position': 'back',
                  'elefant_foot_compensation': '0.15', 'enable_support': '0', 'enable_prime_tower': '0', 'print_sequence': 'by object',
                  'curr_bed_type': 'Textured PEI Plate'}
-    cfg, machine, process, fil = a1_profile.project_config(tmpl, COLOURS, overrides)
-    for k, v in tmpl.items():                       # generic keys only present in the project format: take the template value
-        if k in cfg: continue
-        if isinstance(v, list) and len(v) == len(tmpl['filament_colour']):
-            cfg[k] = (v + [v[-1]] * n)[:n]
-        else:
-            cfg[k] = v
-    cfg['print_compatible_printers'] = ['Bambu Lab A1 0.4 nozzle']
-    cfg['filament_ids'] = [fil.get('filament_id', 'GFG02')] * n
-    M = [[0, 150, 320], [280, 0, 460], [150, 150, 0]]   # purge mm3: from grey/black/yellow -> to
-    cfg['flush_volumes_matrix'] = [str(x) for row in M for x in row]
-    cfg['flush_volumes_vector'] = ['140'] * (2 * n)
-    files['Metadata/project_settings.config'] = json.dumps(cfg, indent=4)
+    cfg, _src = a1_safe.project_config(tmpl, COLOURS, overrides)   # proven key set + order, A1 release values
+    probs = a1_safe.check(cfg, tmpl); assert not probs, probs
+    if not geometry_only:
+        files['Metadata/project_settings.config'] = json.dumps(cfg, indent=4)
     files['[Content_Types].xml'] = open(f'{orig}/[Content_Types].xml').read()
     files['_rels/.rels'] = ('<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n'
                             ' <Relationship Target="/3D/3dmodel.model" Id="rel-1" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/>\n</Relationships>\n')
-    fn = f'{out}/AB_Rollie_Book_v7_A1_by_object.3mf'
+    fn = f'{out}/AB_Rollie_Book_v7_A1_' + ('geometry_only' if geometry_only else 'by_object') + '.3mf'
     with zipfile.ZipFile(fn, 'w', zipfile.ZIP_DEFLATED) as z:
         for k, v in files.items(): z.writestr(k, v)
     sd = f'{out}/stl'; os.makedirs(sd, exist_ok=True)
@@ -109,6 +100,7 @@ def export(r, out, orig):
 if __name__ == '__main__':
     r = v7.build(); print(v7.checks(r))
     fn, hulls, cfg = export(r, sys.argv[1], sys.argv[2])
+    fn2, _h, _c = export(r, sys.argv[1], sys.argv[2], geometry_only=True); print(fn2)
     names = list(hulls)
     def gap(a, b):
         ax0, ay0, ax1, ay1, _ = hulls[a]; bx0, by0, bx1, by1, _ = hulls[b]
