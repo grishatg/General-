@@ -230,7 +230,36 @@ def concept_instrument():
     return dict(key='instrument', name='INSTRUMENT', d=d, parts=parts, mono=mono, font='JetBrains Mono ExtraBold',
                 colours=['black', 'grey', 'yellow'])
 
-CONCEPTS = {'monolith': concept_monolith, 'ripple': concept_ripple, 'tide': concept_tide, 'form': concept_form, 'instrument': concept_instrument}
+
+def concept_hybrid():
+    """Judge-proposed Monolith x Ripple: grey cover, ripples that build toward the opening edge, black tray,
+    one yellow datum that wraps the edge, yellow sleeve, lowercase a.b. Yellow inlays 1.0 mm deep (no show-through)."""
+    d = base(); tray, cover, ys = d['tray'], d['cover'], d['ys']
+    def rip(x0, x1, z0, z1, toward_right):
+        out = []
+        for xc in np.arange(x0, x1, 2.8):
+            t = (xc - x0) / (x1 - x0); t = t if toward_right else 1 - t
+            A = 0.05 + 1.5 * t ** 1.6
+            zs = np.linspace(z0, z1, 140)
+            out.append(LineString([(xc + A * np.sin(2 * np.pi * z / 26.0 + 0.22 * xc), z) for z in zs]))
+        return out
+    fr = [l.intersection(FRONT.buffer(-1.6)).difference(KEEP.buffer(1.0)) for l in rip(1.8, 24.0, 9.8, 75.2, True)]
+    cover = grooves(cover, [l for l in fr if not l.is_empty and l.length > 15], 'f')
+    br = [l.intersection(BACK.buffer(-1.6)).difference(sbox(-40, 30.2, 40, 34.8)) for l in rip(-24.0, -1.8, 9.8, 75.2, False)]
+    tray = grooves(tray, [g for l in br for g in getattr(l, 'geoms', [l]) if not g.is_empty and g.length > 15], 'b')
+    cover, y1 = inlay(cover, sbox(-23.0, 32.0, -0.8, 33.0), 'f', 1.0)
+    tray, y2 = inlay(tray, sbox(-29.0, 32.0, -6.0, 33.0), 'b', 1.0)                 # runs out over the edge chamfer
+    cover, y3 = inside_inlay(cover, sbox(-17.5, 32.0, 19.0, 33.0), ys)
+    raw = text_poly('a·b', 4.6, 'SpaceGrotesk-Bold.ttf', thicken=0)
+    dot_c = min(raw.geoms, key=lambda q: q.area).centroid
+    th = text_poly('a·b', 4.6, 'SpaceGrotesk-Bold.ttf')
+    mono = unary_union([q for q in th.geoms if q.area > 1.5] + [Point(dot_c.x, dot_c.y).buffer(0.7, quad_segs=16)])
+    cut = cs(mono).extrude(1.0 + 0.5).translate((0, 0, -0.5)).mirror((0, 1, 0)); y4 = cut ^ tray; tray = tray - cut
+    parts = [(cover, 'grey', 'cover'), (tray, 'black', 'tray'), (d['sleeve'], 'yellow', 'sleeve'),
+             (y1, 'yellow', 'cover'), (y3, 'yellow', 'cover'), (y2, 'yellow', 'tray'), (y4, 'yellow', 'tray')]
+    return dict(key='hybrid', name='HYBRID', d=d, parts=parts, mono=mono, font='Space Grotesk Bold', colours=['grey', 'black', 'yellow'])
+
+CONCEPTS = {'monolith': concept_monolith, 'ripple': concept_ripple, 'tide': concept_tide, 'form': concept_form, 'instrument': concept_instrument, 'hybrid': concept_hybrid}
 
 if __name__ == '__main__':
     import time
