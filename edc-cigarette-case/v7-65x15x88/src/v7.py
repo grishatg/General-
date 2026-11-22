@@ -17,8 +17,13 @@ from shapely import affinity
 LAYER0, LAYER = 0.2, 0.16
 MAG_D, MAG_T = 9.51, 2.51
 POCKET_D, SKIN, GAP = 9.7, 0.4, 0.2
-YD = 1.0                       # yellow inlay depth: 0.2 + 5 x 0.16
+YD = 0.68                      # visible (bed-face) yellow: 4 layers = 0.2 + 3 x 0.16, stops well short of the grey/black body
+AB_D = 0.68                    # initials inlay depth on the bottom face
 FONT, CAP = 'Inter-Bold.ttf', 5.0
+BADGE_LAYERS, BADGE_W, BADGE_H, BADGE_CLR = 6, 17.0, 7.0, 0.10
+USE_BADGE = False              # optional: initials as a separate press-fit badge
+CAPTURE = False                # True: magnets sealed in via pauses (by-layer only). False: snap-in pockets (works by-object)
+LIP_H, LIP_INT, LIP_SLOTS, LIP_SLOT_W = 0.4, 0.12, 4, 0.8   # snap lip: height, radial interference, relief slots
 
 P = dict(v5.P)
 P.update(TC=3.0, WB=2.6, WS=2.6, END=9.0, R=2.8, G=0.3, CF=1.6, CB=2.2, CE=1.0, FACET=6.0,
@@ -59,11 +64,29 @@ def build():
     env = v5.envelope(P)
     # ---- magnet clasp (sealed-in magnets) ----
     boss_top = YS + BOSS_H
-    c_top_z = snap_down((boss_top - SKIN) + D / 2)                    # cover prints face-down: z = y + D/2
-    c_pocket = ycyl(POCKET_D / 2, c_top_z - (MAG_T + 0.09) - D / 2, c_top_z - D / 2)
     rec_floor = YS + BOSS_H + GAP
-    t_top_z = snap_down(D / 2 - (rec_floor + SKIN))                   # tray prints back-down: z = D/2 - y
-    t_pocket = ycyl(POCKET_D / 2, D / 2 - t_top_z, D / 2 - (t_top_z - (MAG_T + 0.09)))
+    if CAPTURE:
+        c_top_z = snap_down((boss_top - SKIN) + D / 2)                # cover prints face-down: z = y + D/2
+        c_pocket = ycyl(POCKET_D / 2, c_top_z - (MAG_T + 0.09) - D / 2, c_top_z - D / 2)
+        t_top_z = snap_down(D / 2 - (rec_floor + SKIN))               # tray prints back-down: z = D/2 - y
+        t_pocket = ycyl(POCKET_D / 2, D / 2 - t_top_z, D / 2 - (t_top_z - (MAG_T + 0.09)))
+    else:
+        # snap-in pockets open to the closing faces: magnet clicks past a slotted 0.4 mm lip (no pause, no glue)
+        def snap_pocket(face_y, inward):                              # inward = +1 (into tray) or -1 (into cover)
+            lip_r = MAG_D / 2 - LIP_INT
+            y_lip = face_y + inward * LIP_H
+            body = ycyl(POCKET_D / 2, y_lip - inward * 0.0, y_lip + inward * (MAG_T + 0.05))
+            mouth = ycyl(lip_r, face_y - inward * 0.5, y_lip + inward * 0.01)
+            slots = []
+            for k in range(LIP_SLOTS):
+                a = np.pi / 4 + k * 2 * np.pi / LIP_SLOTS
+                sl = chbox(-LIP_SLOT_W / 2, LIP_SLOT_W / 2, min(face_y - inward * 0.5, y_lip + inward * 0.01), max(face_y - inward * 0.5, y_lip + inward * 0.01),
+                           0, POCKET_D / 2 + 0.05, cv=0.05)
+                slots.append(sl.rotate((0, np.degrees(a), 0)).translate((MX, 0, MZ)))
+            return body + mouth + m3.Manifold.batch_boolean(slots, m3.OpType.Add), y_lip
+        c_pocket, c_lip_y = snap_pocket(boss_top, -1)
+        t_pocket, t_lip_y = snap_pocket(rec_floor, +1)
+        c_top_z = c_lip_y + D / 2; t_top_z = D / 2 - t_lip_y
     pillar = chbox(PILLAR_X0, CX1 + 0.5, YS, D / 2 - WB + 0.1, MZ - POCKET_D / 2 - 1.4, MZ + POCKET_D / 2 + 1.4, cv=0.1)
     lip_slot = chbox(CX1 - 1.2 - GAP, CX1 + 0.1, YS - 1.0, YS + 1.4 + GAP, MZ - POCKET_D / 2 - 1.6, MZ + POCKET_D / 2 + 1.6, cv=0.1)
     fr_poly = v5.notched_panel(CX0 + 5.0, CX1 - 2.5, END + 3.0, H - END - 3.0, c=3.0, step=3.0)
@@ -93,30 +116,61 @@ def build():
     tray, y2 = v6.inlay(tray, sbox(-W / 2 - 2.0, zd - 0.5, -7.0, zd + 0.5), 'b', YD)
     cover, y3 = v6.inside_inlay(cover, sbox(-(W / 2 - 10.0), zd - 0.5, W / 2 - 16.0, zd + 0.5), ys)
     mono = monogram()
-    cut = v3.cs(mono).extrude(YD + 0.5).translate((0, 0, -0.5)).mirror((0, 1, 0)); y4 = cut ^ tray; tray = tray - cut
+    badge_black = badge_yellow = None; bt = 0.0
+    if USE_BADGE:
+        # ---- initials as a separate press-fit badge (prints flat: only BADGE_LAYERS layers of colour changes) ----
+        bt = LAYER0 + (BADGE_LAYERS - 1) * LAYER                            # 6 layers -> 1.0 mm
+        outline = Polygon(K.chrect(-BADGE_W / 2, BADGE_W / 2, -BADGE_H / 2, BADGE_H / 2, 1.2)).buffer(0.6, join_style=1).buffer(-0.6, join_style=1)
+        def bottom_solid(geom, z0, z1):                                     # face coords (gx right, gy up as seen from below) -> world
+            return v3.cs(geom).extrude(z1 - z0).translate((0, 0, z0)).mirror((0, 1, 0))
+        pocket = bottom_solid(outline.buffer(BADGE_CLR, join_style=1), -0.5, bt + 0.02)
+        ribs = []
+        for gx in (-BADGE_W / 4, BADGE_W / 4):                              # crush ribs: 0.12 mm interference
+            for sgn in (-1, 1):
+                ribs.append(Point(gx, sgn * (BADGE_H / 2 + BADGE_CLR)).buffer(BADGE_CLR + 0.12 + 0.0, quad_segs=12))
+        for sgn in (-1, 1):
+            ribs.append(Point(sgn * (BADGE_W / 2 + BADGE_CLR), 0).buffer(BADGE_CLR + 0.12, quad_segs=12))
+        rib_solid = bottom_solid(unary_union(ribs).intersection(outline.buffer(BADGE_CLR + 0.3)), 0.25, bt)
+        tray = (tray - pocket) + (rib_solid ^ v5.envelope(P))
+        letters = bottom_solid(mono, 0, bt)
+        base_ = bottom_solid(outline.difference(mono), 0, bt)
+        chamfer_cut = bottom_solid(outline.difference(outline.buffer(-0.3, join_style=1)), 0, 0.3)   # crisp 0.3 mm shadow line
+        badge_black = base_ - chamfer_cut
+        badge_yellow = letters
+        y4 = None
+    else:   # inlaid on the bottom face, dead-centre
+        cut = v3.cs(mono).extrude(AB_D + 0.5).translate((0, 0, -0.5)).mirror((0, 1, 0)); y4 = cut ^ tray; tray = tray - cut
     d['knuckle_mod'] = d['knuckle_mod'] + chbox(PILLAR_X0 - 1, W / 2 + 1, -D, D, MZ - 9, MZ + 9, cv=0.1)
-    return dict(d=d, tray=tray, cover=cover, sleeve=d['sleeve'], yel_cover=[y1, y3], yel_tray=[y2, y4], mono=mono,
-                c_pocket=c_pocket, t_pocket=t_pocket, pause_cover_z=c_top_z + LAYER, pause_tray_z=t_top_z + LAYER,
+    return dict(d=d, tray=tray, cover=cover, sleeve=d['sleeve'], yel_cover=[y1, y3], yel_tray=[y2] + ([y4] if y4 is not None else []), mono=mono,
+                badge_black=badge_black, badge_yellow=badge_yellow, badge_t=bt,
+                c_pocket=c_pocket, t_pocket=t_pocket, pause_cover_z=(c_top_z + LAYER) if CAPTURE else None, pause_tray_z=(t_top_z + LAYER) if CAPTURE else None,
                 c_top_z=c_top_z, t_top_z=t_top_z, zd=zd)
 
 def checks(r):
     a, b, s = r['tray'], r['cover'], r['sleeve']
     allp = [a, b, s] + r['yel_cover'] + r['yel_tray']
     ov = sum((x ^ y).volume() for i, x in enumerate(allp) for y in allp[i + 1:])
+    ov_ribs = round(((r['badge_black'] + r['badge_yellow']) ^ a).volume(), 3) if r['badge_black'] is not None else None
     bb = (a + b + s).bounding_box()
     RR = m3.Manifold.batch_boolean(v5.rollups(r['d']), m3.OpType.Add)
     XA_, YA_ = r['d']['axis']
     swing = [g for g in range(0, 166, 5) if (b.translate((-XA_, -YA_, 0)).rotate((0, 0, -g)).translate((XA_, YA_, 0)) ^ a).volume() > 0.02]
-    def wall(part, pocket, grow=0.8):
-        bbp = pocket.bounding_box(); g = ycyl(POCKET_D / 2 + grow, bbp[1], bbp[4])
-        return round((g - pocket - part).volume(), 3)
+    def wall(part, pocket, grow=0.8, which=None):
+        if CAPTURE:
+            bbp = pocket.bounding_box(); g = ycyl(POCKET_D / 2 + grow, bbp[1], bbp[4])
+            return round((g - pocket - part).volume(), 3)
+        face, inward = ((YS + BOSS_H, -1) if which == 'cover' else (YS + BOSS_H + GAP, +1))
+        y_lip = face + inward * LIP_H; y_bot = y_lip + inward * (MAG_T + 0.05)
+        g = ycyl(POCKET_D / 2 + grow, y_lip, y_bot + inward * grow)
+        return round((g - ycyl(POCKET_D / 2, y_lip, y_bot) - part).volume(), 3)
     return dict(env=[round(bb[i + 3] - bb[i], 2) for i in range(3)], pieces=(len(a.decompose()), len(b.decompose())), overlap=round(ov, 3),
                 rollups=len(v5.rollups(r['d'])), rollups_vs_tray=round((RR ^ a).volume(), 3), swing_contacts=swing,
-                tray_wall_void=wall(a, r['t_pocket']), cover_wall_void=wall(b, r['c_pocket']),
-                magnet_gap=round((D / 2 - r['t_top_z']) - (r['c_top_z'] - D / 2) - 0.18, 2),
-                pause_cover_z=round(r['pause_cover_z'], 2), pause_tray_z=round(r['pause_tray_z'], 2),
-                cover_front_skin=round(r['c_top_z'] - (MAG_T + 0.09), 2), MX=round(MX, 2), slot_x1=round(P['SLOT_X1'], 2),
-                mono=[round(v, 2) for v in r['mono'].bounds], datum_z=r['zd'])
+                tray_wall_void=wall(a, r['t_pocket'], which='tray'), cover_wall_void=wall(b, r['c_pocket'], which='cover'),
+                magnet_gap=round((D / 2 - r['t_top_z']) - (r['c_top_z'] - D / 2) - (0.18 if CAPTURE else 0.0), 2),
+                pauses=(r['pause_cover_z'], r['pause_tray_z']),
+                cover_front_skin=round(r['c_top_z'] - (MAG_T + (0.09 if CAPTURE else 0.05)), 2), MX=round(MX, 2), slot_x1=round(P['SLOT_X1'], 2),
+                mono=[round(v, 2) for v in r['mono'].bounds], datum_z=r['zd'], badge_mm=round(r['badge_t'], 2),
+                rib_interference_mm3=ov_ribs, yellow_depth_mm=YD)
 
 if __name__ == '__main__':
     r = build(); print(checks(r))

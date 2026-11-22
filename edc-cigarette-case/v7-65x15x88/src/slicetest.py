@@ -105,7 +105,8 @@ def plate(r):
     tray = drop([(tray_rot(r['tray']), 'part', 2, {})] + [(tray_rot(y), 'part', 3, {}) for y in r['yel_tray']] + [(tray_rot(mod), 'mod', 0, M100)])
     cover = drop([(cover_rot(r['cover']), 'part', 1, {})] + [(cover_rot(y), 'part', 3, {}) for y in r['yel_cover']] + [(cover_rot(mod), 'mod', 0, M100)])
     sleeve = drop([(r['sleeve'], 'part', 3, {})])
-    return [('Cover', cover, (110, 128))], [('Tray', tray, (110, 128))], [('Sleeve', sleeve, (128, 128))]
+    badge = drop([(r['badge_black'], 'part', 2, {}), (r['badge_yellow'], 'part', 3, {})]) if r.get('badge_black') is not None else None
+    return [('Cover', cover, (110, 128))], [('Tray', tray, (110, 128))], [('Sleeve', sleeve, (128, 128))], ([('Badge', badge, (128, 128))] if badge else [])
 
 def slice_one(p3mf, ini, gcode):
     cmd = ['prusa-slicer', '--export-gcode', '--load', ini, '--output', gcode, p3mf]
@@ -126,14 +127,15 @@ def report(gcode):
 if __name__ == '__main__':
     r = v7.build()
     pz_cover, pz_tray = r['pause_cover_z'], r['pause_tray_z']
-    p1, p2, p3 = plate(r)
+    p1, p2, p3, p4 = plate(r)
     TIMING = os.environ.get('TIMING') == '1'
-    prusa_3mf(f'{OUT}/plate1_cover.3mf', p1, [] if TIMING else [r['pause_cover_z']])
-    prusa_3mf(f'{OUT}/plate2_tray.3mf', p2, [] if TIMING else [r['pause_tray_z']])
+    prusa_3mf(f'{OUT}/plate1_cover.3mf', p1, [] if (TIMING or not r['pause_cover_z']) else [r['pause_cover_z']])
+    prusa_3mf(f'{OUT}/plate2_tray.3mf', p2, [] if (TIMING or not r['pause_tray_z']) else [r['pause_tray_z']])
     prusa_3mf(f'{OUT}/plate3_sleeve.3mf', p3, [])
+    if p4: prusa_3mf(f'{OUT}/plate3b_badge.3mf', p4, [])
     for lh in LH:
         ini = f'{OUT}/p1s_petghf_{lh}.ini'; config(lh, ini)
-        for name in ('plate1_cover', 'plate2_tray', 'plate3_sleeve'):
+        for name in ('plate1_cover', 'plate2_tray', 'plate3_sleeve') + (('plate3b_badge',) if p4 else ()):
             gc = f'{OUT}/{name}_{lh}.gcode'
             res = slice_one(f'{OUT}/{name}.3mf', ini, gc)
             warn = [l for l in (res.stdout + res.stderr).splitlines() if re.search(r'warn|error|empty|thin|floating|fail', l, re.I)]
