@@ -75,7 +75,8 @@
 | Settings vs Bambu's option rules at releases **2.03, 2.08 and 2.09** | PASS: no flag that the creator's (working) file doesn't also raise. The previous file raised 60 to 123 more, plus the dual-nozzle keys |
 | 3MF integrity: 9 manifold meshes, part filaments 1/2/3, 2 modifiers, 1 plate by object | PASS (read back from the shipped file) |
 | Re-slice of the shipped file | PASS (see above) |
-| Opened in real Bambu Studio | NOT_EVALUATED here: Bambu Studio can't be downloaded in this build environment. The loader was checked against Bambu's source instead |
+| Opened and sliced in real Bambu Studio (owner, A1) | PASS: "opened fine, sliced great" (22 Nov 2026) |
+| Test print | PENDING: printer busy; first print planned for 23 Nov 2026 |
 
 `src/` holds the generators:
 - `a1_safe.py`: settings builder
