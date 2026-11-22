@@ -1,6 +1,6 @@
 # DESIGN.md: "Trail Kit" design language for the EDC case family
 
-> Status: **v0.1, provisional.** These values were codified from the v1–v4 builds, not from user testing. Anything marked ⚠ is a sensible default awaiting a test print.
+> Status: **v0.2, provisional.** These values were codified from the v1–v5 builds and revised after a research agent and an independent design critique. Nothing has been checked against user testing yet. Anything marked ⚠ is a sensible default awaiting a test print.
 
 This is an original design language inspired by JanBerry Design's *Hiking Container* (rugged outdoor kit: faceted, grippy, honest hardware). No geometry from that model is used.
 
@@ -14,34 +14,37 @@ This is an original design language inspired by JanBerry Design's *Hiking Contai
 ## 2. Colour tokens
 | Token | Hex | Use |
 |---|---|---|
-| `shell` | `#3B4A2F` (dark forest / military green) | All structure |
-| `accent` | `#F2B705` (signal yellow) | Inlays, monogram, spine sleeve |
+| `shell` | `#39541A`, Bambu PETG HF Forest Green (design intent `#3B4A2F`) | All structure |
+| `accent` | `#FFD00B`, Bambu PETG HF Yellow (design intent `#F2B705`) | Inlays, monogram, spine sleeve, inside data plate |
 | Ratio | about 85–90% shell : 10–15% accent | Measured by face area |
 
-⚠ Filament matches still need confirming in the chosen material, for example a matte dark green and a matte or basic yellow.
+⚠ The hex values come from retailer copies of Bambu's colour tables. Check them against real spools.
 
 ## 3. Geometry tokens (mm)
 | Token | Value | Notes |
 |---|---|---|
 | `env` | 55 × 13 × 85 | Outer envelope, fixed |
-| `edge.chamfer` | 1.0 ⚠ | Perimeter chamfer on every outer edge. A reviewer may push this to 1.5–2.0 for hand-feel |
+| `edge.chamfer` | 1.5 front / 2.0 back / 1.0 top and bottom | Bed-side edges are chamfered, not filleted, so they print without overhang |
+| `facet` | 5.0 × 45° | Opening-side corners of the front outline (octagonal silhouette); panels repeat this as 9 mm corner cuts |
 | `wall.face` | 2.4–2.8 | Tray back / cover plate |
 | `wall.side` | 2.4 | |
-| `block.end` | 6.5 | Solid end blocks: magnets and strength |
+| `block.end` | 8.5 | Solid end blocks: magnets (1.1 mm wall) and strength. v4 at 6.5 mm left only 0.15 mm of wall |
 | `inlay.depth` | 0.6 | About 4 layers at 0.16 mm |
-| `inlay.line.min` | 0.6 (detail) / 1.0–1.2 (frames, index lines) | Below 0.6 mm the AMS can smear |
-| `knurl` | Pyramids 2.1 base, 2.2 pitch, 0.9 high, tips flush | The signature grip texture |
+| `inlay.line.min` | 1.0 (detail) / 1.4–1.6 (frames, index lines) | Thinner lines smear on a 0.4 mm nozzle |
+| `inlay.keepout` | ≥ 0.8 from magnets | Yellow never sits over a magnet pocket |
+| `knurl` | Truncated pyramids: 2.2 base, 0.6 flat top, 2.4 pitch, 0.9 high; tops flush | Flat tops print on the bed and feel less sharp |
 | `panel.notch` | 45° step, 3–3.5 deep, at 55% of panel width | The signature stepped notch on the panel's top edge |
-| `fit.hinge` | 0.3 knuckle gap; pin hole 2.1 for a 2.0 rod | ⚠ |
+| `fit.hinge` | 0.3 knuckle gap; tray knuckles Ø1.95 (press fit, ream with a 2.0 drill); cover knuckles Ø2.2 (slip); sleeve Ø2.3; teardrop bores | ⚠ print the test block first |
+| `channel` | 6.8 slot / 1.2 rib / 3.0 high | For rollies 5–6 mm; use 7.4 for fatter rolls |
 | `fit.lip` | 0.15 per side | ⚠ |
-| `magnet` | 6 × 2 N52, pocket Ø6.2 × 2.1 | ⚠ |
+| `magnet` | 6 × 2 N52; pocket Ø6.3 × 2.4 (tray), × 2.1 (cover); thick CA or epoxy | ⚠ check polarity |
 
 ## 4. Motifs (surface library)
 | Motif | Type | Rules |
 |---|---|---|
-| **Contour** | Flush inlay | Every 5th line is an index line (1.2 mm); 0.7 mm otherwise; plus a neatline border |
-| **Trailhead** | Knurl + flush frame | Recessed knurl panel with the stepped notch; 1.0 mm yellow frame offset 1.6 mm out from it |
-| **Gridline** | Flush inlay | 9 mm grid, 0.6 mm lines, crosshair ring Ø12, tick marks on the bottom edge |
+| **Contour** | Flush inlay | 13 levels; every 4th is an index line (1.6 mm); 1.0 mm otherwise; plus a 1.2 mm neatline border |
+| **Trailhead** | Knurl + flush frame | Recessed flat-top knurl panel with the stepped notch; 1.4 mm yellow frame offset 2.0 mm out from it; kept clear of the end blocks |
+| **Gridline** | Flush inlay | 12 mm grid, 1.0 mm lines, Ø13 waypoint ring, 1.2 mm frame |
 | **Hazard** | Flush inlay | 45° chevrons, 6 mm pitch, in a framed band. For caps only |
 
 ## 5. Typography
@@ -56,4 +59,9 @@ This is an original design language inspired by JanBerry Design's *Hiking Contai
 - Decorated faces print **on the bed** (face-down), so inlays come out crisp and flush.
 - **No supports.** Overhangs are 45° or less, and horizontal holes are 3 mm or smaller.
 - **Infill:** 4 walls and 50% gyroid as baseline; **100% with 6 walls** on the hinge and magnet blocks via modifiers.
-- **Material:** PETG-HF or ASA for carry and heat ⚠; PLA Matte for display pieces.
+- **Material:** **Bambu PETG HF** (heat deflection 62 °C under load; UK car cabins reach about 55 °C). PLA Matte is for display pieces only.
+- Raise *Bottom painting layer penetration* to the inlay layer count, then check layer 1 in the preview.
+- Use a small prime tower. Flushing into infill can show through thin walls.
+
+## 8. Inside language
+- **Inside the cover:** a raised 0.8 mm notched-octagon stiffening frame, a flush yellow 60 mm ruler (5 mm ticks), and a mirrored monogram that reads correctly when the case is open.
