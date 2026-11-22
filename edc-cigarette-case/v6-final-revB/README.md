@@ -1,4 +1,4 @@
-# AB Rollie Book: FINAL rev B (Design 6 "Hybrid")
+# AB Rollie Book: FINAL rev B (Design 6 "Hybrid"), SUPERSEDED by ../v7-65x15x88
 
 ![final](finalb_sheet.png)
 
