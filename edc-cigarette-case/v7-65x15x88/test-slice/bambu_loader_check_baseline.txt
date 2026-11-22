@@ -1,0 +1,67 @@
+v02.03.01.51: 26 problem(s)
+    [v02.03.01.51] ensure_vertical_shell_thickness: enum value(s) ['1'] not in ['disabled', 'enabled', 'partial']
+    [v02.03.01.51] key #65 filament_deretraction_speed: unknown option
+    [v02.03.01.51] key #71 filament_long_retractions_when_cut: unknown option
+    [v02.03.01.51] key #75 filament_retract_before_wipe: unknown option
+    [v02.03.01.51] key #76 filament_retract_restart_extra: unknown option
+    [v02.03.01.51] key #77 filament_retract_when_changing_layer: unknown option
+    [v02.03.01.51] key #78 filament_retraction_distances_when_cut: unknown option
+    [v02.03.01.51] key #79 filament_retraction_length: unknown option
+    [v02.03.01.51] key #80 filament_retraction_minimum_travel: unknown option
+    [v02.03.01.51] key #81 filament_retraction_speed: unknown option
+    [v02.03.01.51] key #92 filament_wipe: unknown option
+    [v02.03.01.51] key #93 filament_wipe_distance: unknown option
+v02.08.04.61: 26 problem(s)
+    [v02.08.04.61] ensure_vertical_shell_thickness: enum value(s) ['1'] not in ['disabled', 'enabled', 'partial']
+    [v02.08.04.61] key #65 filament_deretraction_speed: unknown option
+    [v02.08.04.61] key #71 filament_long_retractions_when_cut: unknown option
+    [v02.08.04.61] key #75 filament_retract_before_wipe: unknown option
+    [v02.08.04.61] key #76 filament_retract_restart_extra: unknown option
+    [v02.08.04.61] key #77 filament_retract_when_changing_layer: unknown option
+    [v02.08.04.61] key #78 filament_retraction_distances_when_cut: unknown option
+    [v02.08.04.61] key #79 filament_retraction_length: unknown option
+    [v02.08.04.61] key #80 filament_retraction_minimum_travel: unknown option
+    [v02.08.04.61] key #81 filament_retraction_speed: unknown option
+    [v02.08.04.61] key #92 filament_wipe: unknown option
+    [v02.08.04.61] key #93 filament_wipe_distance: unknown option
+v02.09.01.70: 26 problem(s)
+    [v02.09.01.70] ensure_vertical_shell_thickness: enum value(s) ['1'] not in ['disabled', 'enabled', 'partial']
+    [v02.09.01.70] key #65 filament_deretraction_speed: unknown option
+    [v02.09.01.70] key #71 filament_long_retractions_when_cut: unknown option
+    [v02.09.01.70] key #75 filament_retract_before_wipe: unknown option
+    [v02.09.01.70] key #76 filament_retract_restart_extra: unknown option
+    [v02.09.01.70] key #77 filament_retract_when_changing_layer: unknown option
+    [v02.09.01.70] key #78 filament_retraction_distances_when_cut: unknown option
+    [v02.09.01.70] key #79 filament_retraction_length: unknown option
+    [v02.09.01.70] key #80 filament_retraction_minimum_travel: unknown option
+    [v02.09.01.70] key #81 filament_retraction_speed: unknown option
+    [v02.09.01.70] key #92 filament_wipe: unknown option
+    [v02.09.01.70] key #93 filament_wipe_distance: unknown option
+
+Full flag list at v02.09.01.70 (all 26 are ALSO raised on the creator's original file, which loads fine in Bambu Studio, so they are benign legacy keys handled by Bambu):
+  [v02.09.01.70] ensure_vertical_shell_thickness: enum value(s) ['1'] not in ['disabled', 'enabled', 'partial']
+  [v02.09.01.70] key #65 filament_deretraction_speed: unknown option
+  [v02.09.01.70] key #71 filament_long_retractions_when_cut: unknown option
+  [v02.09.01.70] key #75 filament_retract_before_wipe: unknown option
+  [v02.09.01.70] key #76 filament_retract_restart_extra: unknown option
+  [v02.09.01.70] key #77 filament_retract_when_changing_layer: unknown option
+  [v02.09.01.70] key #78 filament_retraction_distances_when_cut: unknown option
+  [v02.09.01.70] key #79 filament_retraction_length: unknown option
+  [v02.09.01.70] key #80 filament_retraction_minimum_travel: unknown option
+  [v02.09.01.70] key #81 filament_retraction_speed: unknown option
+  [v02.09.01.70] key #92 filament_wipe: unknown option
+  [v02.09.01.70] key #93 filament_wipe_distance: unknown option
+  [v02.09.01.70] key #94 filament_z_hop: unknown option
+  [v02.09.01.70] key #95 filament_z_hop_types: unknown option
+  [v02.09.01.70] key #153 machine_max_acceleration_e: unknown option
+  [v02.09.01.70] key #157 machine_max_acceleration_x: unknown option
+  [v02.09.01.70] key #158 machine_max_acceleration_y: unknown option
+  [v02.09.01.70] key #159 machine_max_acceleration_z: unknown option
+  [v02.09.01.70] key #160 machine_max_jerk_e: unknown option
+  [v02.09.01.70] key #161 machine_max_jerk_x: unknown option
+  [v02.09.01.70] key #162 machine_max_jerk_y: unknown option
+  [v02.09.01.70] key #163 machine_max_jerk_z: unknown option
+  [v02.09.01.70] key #164 machine_max_speed_e: unknown option
+  [v02.09.01.70] key #165 machine_max_speed_x: unknown option
+  [v02.09.01.70] key #166 machine_max_speed_y: unknown option
+  [v02.09.01.70] key #167 machine_max_speed_z: unknown option
