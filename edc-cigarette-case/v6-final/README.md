@@ -45,3 +45,15 @@
 | Hand-feel, initials legibility, hinge and magnet fit | NOT_EVALUATED (needs a test print) |
 
 The alternative font is in `final_font_options.png`. Swapping it is a one-line change in `src/v6_final.py` (`FONT`).
+
+## ⚠ Open item: magnets (do not print yet)
+The owner has only **2 magnets**, and their size is to be confirmed. This file has pockets for 4 × 6×2 mm magnets.
+
+When the size arrives:
+- **Default plan:** put both magnets in the tray end blocks (one at each end) and add a steel striker in each cover pocket, such as a small steel washer or disc. That keeps the closing force even at both ends.
+- **Fallback (no steel parts):** one magnet pair at a single end, plus friction from the lip. This is simpler but closes unevenly.
+
+What fits without structural change:
+- **Diameter:** up to about Ø6.5 mm in the 8.5 mm end blocks.
+- **Thickness:** up to about 4 mm on the tray side and about 2.1 mm in the cover plate.
+- **Larger magnets:** the end blocks can grow to about 11 mm (there is about 8 mm of spare length above the 60 mm rollies), which allows about Ø9.5 mm.
