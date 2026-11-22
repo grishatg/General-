@@ -1,4 +1,4 @@
-# AB Rollie Book: final (Design 6 "Hybrid")
+# AB Rollie Book: final (Design 6 "Hybrid"), SUPERSEDED by ../v6-final-revB (2 magnets only, no extra hardware)
 
 ![final](final_sheet.png)
 
